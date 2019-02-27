@@ -120,8 +120,11 @@ func setupDataDirectory(workdir, datadir string) error {
 		[]string{datadir, "gitbase", workdirHash},
 	}
 
+	logrus.Infof("paths: %s", paths)
 	for _, path := range paths {
-		if err := os.MkdirAll(filepath.Join(path...), 0755); err != nil {
+		p := filepath.ToSlash(filepath.Join(path...))
+		logrus.Infof("p: %s", p)
+		if err := os.MkdirAll(p, 0755); err != nil {
 			return errors.Wrap(err, "unable to create data directory")
 		}
 	}
@@ -146,7 +149,7 @@ func createDaemon(workdir string) docker.StartFunc {
 			return errors.Wrap(err, "unable to get home dir")
 		}
 
-		datadir := filepath.Join(homedir, ".srcd")
+		datadir := filepath.ToSlash(filepath.Join(homedir, ".srcd"))
 		if err := setupDataDirectory(workdir, datadir); err != nil {
 			return err
 		}
